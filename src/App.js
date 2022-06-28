@@ -6,6 +6,7 @@ import Home from './Pages';
 import { Provider } from 'react-redux';
 import store from './Store/store';
 import Toasts from './Components/Toasts';
+import { StileSCSS } from './Components/StileSCSS';
 
 function App() {
   return (
@@ -15,7 +16,8 @@ function App() {
           <Toasts />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/scss" element={<StileSCSS />} />
+              <Route path="/home" element={<Home />} />
               <Route path="/page/:page" element={<Home />} />
             </Routes>
           </BrowserRouter>
