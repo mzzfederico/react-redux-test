@@ -1,46 +1,58 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux"
-import { useParams } from "react-router-dom";
-import { fetchPokemonByPage, pokemonReload } from "../Reducers/pokemon.slice";
+import { useEffect,  useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { attackPokemon, loadPokemon } from '../reducers/battle.slice';
+
+const randomPokemonNumber = () => Math.floor(Math.random() * 101);
 
 export default function Home() {
+    const [currentIDs, setCurrentIDs] = useState([]);
     const dispatch = useDispatch();
-    const params = useParams();
 
-    const arePokemonLoading = useSelector(state => state.pokemon.isLoading);
-    const pokemonData = useSelector(state => state.pokemon.data);
+    const allPokemons = useSelector(
+        state => state.battle.pokemons
+    );
 
     useEffect(() => {
-        dispatch(fetchPokemonByPage(params.page));
-    }, [dispatch, params.page]);
+        if (allPokemons.length <= 1) {
+            dispatch( loadPokemon({ id: randomPokemonNumber() }) )
+        }
+    }, [allPokemons.length, dispatch]);
 
     return (
-        <div className="pokemons">
-            {arePokemonLoading && <h1>Caricamento...</h1>}
-            {!arePokemonLoading && JSON.stringify(pokemonData, null, 4)}
-            <button onClick={() => dispatch(pokemonReload)}>ricarica</button>
+        <div className="battle">
+            {allPokemons
+                .filter(pokemon => !pokemon.isLoading && pokemon.data)
+                .map(pokemon => (
+                    <PokemonProfile
+                        key={pokemon.id}
+                        id={pokemon.id}
+                        {...pokemon.data}
+                    />
+                ))}
+        </div>
+    );
+}
+
+function PokemonProfile({ hp, moves, sprite, name, id }) {
+    const dispatch = useDispatch();
+    const targetPokemon = useSelector(
+        state => state.battle.pokemons.find(
+            pokemon => pokemon.id !== id
+        )
+    );
+
+    const onAttack = (name) => dispatch(attackPokemon({ id: targetPokemon.id, name }));
+
+    return (
+        <div className="pokemon">
+            <h2>{name}</h2>
+            <h3>HP: {hp}</h3>
+            <img src={sprite} alt={name} />
+            <div className="moves">
+                {moves.slice(0, 4).map(move => (
+                    <button key={move.name} onClick={() => onAttack(move.name)}>{move.name}</button>
+                ))}
+            </div>
         </div>
     )
 }
-
-/* Esempio con reducer */
-/* export function HomeReducer() {
-    const dispatch = useDispatch();
-    const pokemonsData = useSelector(state => state.pokemon.data);
-
-    useEffect(() => {
-        (async function () {
-            dispatch(loadPokemons());
-            fetch(`https://pokeapi.co/api/v2/pokemon`)
-                .then(response => response.json())
-                .then(json => dispatch(
-                    loadPokemonsSuccess({ pokemons: json.results })
-                ))
-                .catch(error => dispatch(
-                    loadPokemonsFailure()
-                ))
-        })();
-    }, [dispatch]);
-
-    return null;
-} */

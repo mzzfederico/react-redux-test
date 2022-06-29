@@ -1,14 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
-import pokemonSlice from '../Reducers/pokemon.slice';
-import toastsSlice from '../Reducers/toasts.slice';
-import { loadingListener } from './listeners';
+import { listenerMiddleware } from './listeners';
+import battleSlice from '../reducers/battle.slice';
 
 const store = configureStore({
     reducer: {
-        pokemon: pokemonSlice.reducer,
-        toasts: toastsSlice.reducer,
+        battle: battleSlice.reducer
     },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().prepend(loadingListener.middleware)
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().prepend(listenerMiddleware.middleware)
 });
 
 export default store;
