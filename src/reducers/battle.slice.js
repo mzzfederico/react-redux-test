@@ -14,7 +14,10 @@
 import { createAsyncThunk, createReducer, createSlice } from "@reduxjs/toolkit";
 
 const createPokemonData = ({ hp, moves, sprite, name }) => ({
-    hp: hp * 10, moves: moves.map(item=>item.move), sprite, name
+    hp: hp * 10, moves: moves.map(item => item.move), sprite, name
+    /*
+        TODO: Aggiungiamo non solo il front_default, ma anche il back_default, in modo da fare davanti e dietro
+    */
 });
 
 const pokemonInitialState = {
@@ -25,12 +28,19 @@ const pokemonInitialState = {
 
 const initialState = {
     pokemons: []
+    /*
+        TODO: Aggiungiamo un indicatore semplice, per dire per quale pokemon è il turno
+    */
 }
 
 export default createSlice({
     name: "battle",
     initialState: initialState,
-    reducers: {},
+    reducers: {
+        /*
+            TODO: Quando parte un attacco, segnare (o meglio, scambiarsi) il turno
+        */
+    },
     extraReducers: (builder) => {
         builder
             .addCase(loadPokemon.pending, (state, action) => {
@@ -62,12 +72,17 @@ export default createSlice({
                 })
             })
             .addCase(attackPokemon.fulfilled, (state, action) => {
+                /*
+                    TODO: Quando parte un attacco, segnare (o meglio, scambiarsi) il turno (o qui o su reducers)
+                */
+
                 state.pokemons = state.pokemons.map(pokemonState => {
                     if (pokemonState.id === action.meta.arg.id && action.payload.power) {
                         pokemonState.data.hp = (pokemonState.data.hp - action.payload.power);
                     }
                     return pokemonState;
                 });
+
                 state.pokemons = state.pokemons.filter(pokemon => pokemon.data.hp > 0);
             })
     }
